@@ -18,8 +18,10 @@ from yolo.src.tool import draw
 def run_click(path):
     """方式一"""
     result = discern.text_predict(orientation.location_predict(path), path)
+    print(result)
     draw(path, result)
     return result
+
 
 
 def generate_click_points(res):
@@ -62,11 +64,47 @@ def generate_click_points(res):
                 })
             return click_list, points
 
+def generate_tt_click_points(res):
+        print(res)
+        splitArray=res.split("|", -1)
+        contains = dict()
+        points = []
+       
+        click_list = list()
+            # 生成要点击汉字的坐标信息
+        for pointStr in splitArray:
+                print(pointStr)
+                pointArray=pointStr.split(",",-1)
+                # point_x 和 point_y 就是点击的坐标，需要保存起来，生成轨迹的时候需要
+                point_x = int(pointArray[0])
+                point_y = int(pointArray[1])
+                click_list.append((point_x, point_y))
+                h = point_x / CODE_WIDTH * 100
+                u = point_y / CODE_HEIGHT * 100
+                points.append({
+                    "x": int(h * 100),
+                    "y": int(u * 100),
+                    "t": 0,
+                    "dt": random.randint(500, 999)
+                })
+        else:
+                point_x = CONFIRM_START_POINT[0] + random.randint(10, 122)
+                point_y = CONFIRM_START_POINT[1] + random.randint(10, 42)
+                click_list.append((point_x, point_y))
+                # 添加点击确认的坐标信息
+                points.append({
+                    "x": point_x,
+                    "y": point_y,
+                    "t": 3,
+                    "dt": random.randint(500, 1200)
+                })
+        return click_list, points
 
 if __name__ == '__main__':
 
     import time
     import random
+
     path = "test/image.jpg"
     start = time.time()
     res = run_click(path)
