@@ -9,6 +9,7 @@
     "http-proxy-agent": "^7.0.2",
     "https-proxy-agent": "^7.0.6",
     "jsdom": "^26.0.0",
+    "log4js": "^6.9.1",
     "md5": "^2.3.0",
     "node-localstorage": "^3.0.5",
     "socks-proxy-agent": "^8.0.5"

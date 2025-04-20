@@ -356,6 +356,31 @@ api.post('/dy_walletInfo', async function(req, res){
 });
 
 
+//抖音h5  查询用户信息
+api.post('/recharge_external_user_info_cache', async function(req, res){
+    var result={code:0,data:{}};
+    try{
+        
+        var navigatorParams=JSON.parse(req.body.navigatorParams);
+        var reqCookie=req.body.cookie;
+        var cookie=req.headers["cookie"];
+        if(cookie==undefined)
+        cookie=reqCookie;
+        var ip= req.headers["ip"];
+        var port= req.headers["port"];
+        var proxy=null;
+        if(ip!=undefined)
+        proxy={host:ip,port:port,protocol: "http",userName:req.headers["username"],password:req.headers["password"]};
+         
+        result.data = await get_a_bogus_dy.recharge_external_user_info_cache(navigatorParams,cookie,proxy)
+    }catch(ex){
+        console.log(ex);
+        result.code=-1;
+        result.data.err=ex;
+    }
+    res.send(result)
+});
+
 //抖音pc 主页,下单
 api.post('/get_a_bogus_v3_pc_order', async function(req, res){
     var result={code:0,data:{}};
