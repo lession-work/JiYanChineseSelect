@@ -1,31 +1,7 @@
+
 const jsdom = require("jsdom");
-const axios = require("axios");
-var http = require('http')
-const httpsProxyAgent = require('https-proxy-agent');
-const httpProxyAgent = require('http-proxy-agent');
-const log4js= require("log4js");
 const {JSDOM} = jsdom;
-
 let dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-
-// 配置日志记录器
-log4js.configure({
-    appenders: {
-      out: { type: "stdout" }, // 输出到控制台
-      app: {
-        type: "file", // 使用 file appender 进行文件输出
-        filename: "logs/app.log", // 日志文件路径（不需要扩展名，自动添加）
-        pattern: "yyyy-MM-dd", // 日志文件轮换的模式，按天轮换
-        alwaysIncludePattern: true, // 始终在文件名中添加日期后缀
-        daysToKeep: 90, // 保留最近 90 天的日志文件
-        compress: true, // 启用日志文件压缩（.gz 格式）
-      },
-    },
-    categories: {
-      default: { appenders: ["out", "app"], level: "info" }, // 设置日志级别和输出方式
-    },
-  });
-const logger =log4js.getLogger();
 
 proxy_name="d2854925770";
 proxy_password="22m7yzao";
@@ -73,7 +49,7 @@ HTMLElement=function(){
     return new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
 }
 window.requestAnimationFrame = function (res) {
-    console.log("window.requestAnimationFrame ->", res)
+    //console.log("window.requestAnimationFrame ->", res)
 }
 window._sdkGlueVersionMap = {sdkGlueVersion: '1.0.0.62', bdmsVersion: '1.0.1.16', captchaVersion: '4.0.10'}
 
@@ -88,10 +64,10 @@ window.screenX = 0
 window.screenY = 0
 window.pageYOffset = 0
 window.fetch = function (res) {
-    console.log("window.fetch ->",res)
+    //console.log("window.fetch ->",res)
 }
 window.addEventListener=function(res){
-    console.log("window.addEventListener ->",res)
+    //console.log("window.addEventListener ->",res)
 }
 screen = {
     availWidth: 1707,
@@ -101,35 +77,35 @@ screen = {
     colorDepth: 24,
     pixelDepth: 24,
 }
-XMLHttpRequest = dom.window.XMLHttpRequest;
+XMLHttpRequest = function(){};
 span = []
 document = {
     createElement: function (res) {
-        console.log("document.createElement ->", res)
+        //console.log("document.createElement ->", res)
         return []
     },
     documentElement: function (res) {
-        console.log("document.documentElement ->", res)
+        //console.log("document.documentElement ->", res)
         return []
     },
     createEvent: function (res) {
-        console.log("document.createEvent ->", res)
+        //console.log("document.createEvent ->", res)
     },
     addEventListener:function(res,event){
-        console.log("document.addEventListener ->",res, event)
+        //console.log("document.addEventListener ->",res, event)
         if("mousemove"==res || "touchmove"==res || "mousedown"==res
         || "touchstart"==res || "mouseup"==res || "touchend"==res
         || "keydown"==res || "mouseover"==res || "mouseout"==res){
             var x=randomPoint(0,window.innerWidth);
             var y=randomPoint(0,window.innerHeight);
-            console.log("XXXXXXXX= "+x+","+y);
+            //console.log("XXXXXXXX= "+x+","+y);
             event({clientX:x,clientY:y,pageX:x,pageY:y});
-            return dom.window.document.querySelector("p");
+            return new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
         }
         return true;
     },
     getElementsByTagName:function(res){
-        console.log("document.getElementsByTagName ->", res)
+        //console.log("document.getElementsByTagName ->", res)
         return new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
     },
     body: []
@@ -146,8 +122,73 @@ navigator = {
 setTimeout = function () {
 }
 
-get_enviroment(proxy_array)
+//get_enviroment(proxy_array)
 
+
+let screenParams=JSON.parse(process.argv[2]);
+let navigatorParams=JSON.parse(process.argv[3]);
+let windowParams=JSON.parse(process.argv[4]);
+let cookie=process.argv[5]
+
+userAgent=navigatorParams.userAgent;
+screen=screenParams;
+navigator=navigatorParams;
+document.cookie=cookie;
+
+window.innerWidth = windowParams.innerWidth;
+window.innerHeight = windowParams.innerHeight;
+window.outerWidth = windowParams.outerWidth;
+window.outerHeight = windowParams.outerHeight;
+window.screenX = windowParams.screenX;
+window.screenY = windowParams.screenY;
+window.pageYOffset = windowParams.pageYOffset;
+
+if (!window.sessionStorage) {
+    window.sessionStorage = {
+        getItem: function (sKey) {
+            if (!sKey || !this.hasOwnProperty(sKey)) { return null; }
+            return unescape(document.cookie.replace(new RegExp("(?:^|.*;\\s*)" + escape(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*((?:[^;](?!;))*[^;]?).*"), "$1"));
+        },
+        setItem: function (sKey, sValue) {
+            if (!sKey) { return; }
+            document.cookie = escape(sKey) + "=" + escape(sValue) + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+            this.length = document.cookie.match(/\=/g).length;
+        },
+        removeItem: function (sKey) {
+            if (!sKey || !this.hasOwnProperty(sKey)) { return; }
+            document.cookie = escape(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+            this.length--;
+        },
+        length: 0,
+        hasOwnProperty: function (sKey) {
+            return (new RegExp("(?:^|;\\s*)" + escape(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+        }
+    };
+    //window.sessionStorage.length = document.cookie.match(/\=/g).length;
+}
+if (!window.localStorage) {
+    window.localStorage = {
+        getItem: function (sKey) {
+            if (!sKey || !this.hasOwnProperty(sKey)) { return null; }
+            return unescape(document.cookie.replace(new RegExp("(?:^|.*;\\s*)" + escape(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*((?:[^;](?!;))*[^;]?).*"), "$1"));
+        },
+        setItem: function (sKey, sValue) {
+            if (!sKey) { return; }
+            document.cookie = escape(sKey) + "=" + escape(sValue) + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+            this.length = document.cookie.match(/\=/g).length;
+        },
+        removeItem: function (sKey) {
+            if (!sKey || !this.hasOwnProperty(sKey)) { return; }
+            document.cookie = escape(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+            this.length--;
+        },
+        length: 0,
+        hasOwnProperty: function (sKey) {
+            return (new RegExp("(?:^|;\\s*)" + escape(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+        }
+    };
+    //window.localStorage.length = document.cookie.match(/\=/g).length;
+}
 
 /* V 1.0.1.16 */
 if (!window.bdms) {
@@ -8030,130 +8071,7 @@ if (!window.bdms) {
     }();
 }
 
-document.cookie = ""
 
-function get_fp() {
-    var e = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("")
-      , t = e.length
-      , n = Date.now().toString(36)
-      , r = [];
-    r[8] = r[13] = r[18] = r[23] = "_",
-    r[14] = "4";
-    for (var o = 0, i = void 0; o < 36; o++)
-        r[o] || (i = 0 | Math.random() * t,
-        r[o] = e[19 == o ? 3 & i | 8 : i]);
-    return "verify_" + n + "_" + r.join("")
-}
-
-function get_ms_token(length = 182) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return encodeURIComponent(result);
-  }
-
-function isIOS() {
-    var userAgent = navigator.userAgent;
-    return /iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
-
-
-function getCookieItem(key){
-    if(document.cookie==null || document.cookie.length<1){
-        if(key=="s_v_web_id") return get_ms_token();
-    }
-    var cookieArray=document.cookie.split(';');
-    for(var i=0;i<cookieArray.length;i++){
-        var item=cookieArray[i];
-        if(item.trim()=="")
-        continue;
-        item=item.trim();
-        var itemArray= item.split('=');
-        if(itemArray[0]==key && itemArray.length>1)
-        return itemArray[1];
-    }
-}
-
-function replaceCookie(cookies){
-    if(cookies==null)
-    return;
-    let key= cookies.split('=')[0];
-    var cookieArray=document.cookie.split(';');
-    var newCookie="";
-    for(var i=0;i<cookieArray.length;i++){
-        var item=cookieArray[i];
-        if(item=='')
-        continue;
-       let itemArray=item.split('=');
-
-       if(itemArray.length!=2)
-        {newCookie+=item+";";
-        }else{
-            if(itemArray[0]===key){
-            newCookie+=cookies+";";
-            }else {
-                newCookie+=item+";";
-            }
-        }
-    }
-    return newCookie;
-}
-function generateRandomString(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    
-    return result;
-  }
-function getTraceid(){
-    var now = new Date();
-var year = now.getFullYear();
-var month = now.getMonth() + 1;
-var date = now.getDate();
-var hour = now.getHours();
-var minute = now.getMinutes();
-var second = now.getSeconds();
- 
-// 将单个数字前面补零
-month = month < 10 ? '0' + month : month;
-date = date < 10 ? '0' + date : date;
-hour = hour < 10 ? '0' + hour : hour;
-minute = minute < 10 ? '0' + minute : minute;
-second = second < 10 ? '0' + second : second;
- 
-var currentTime = year + month + date + hour + minute + second;
-var ticks =(new Date().valueOf()/10000000);
-currentTime=currentTime+parseInt(ticks);
-return currentTime +generateRandomString(12);
-}
-
-/**正则表达式，匹配数据 */
-function match_Sec_user_id(htmlContent){
-    let matches = htmlContent.match(/(<script\b([^"<>]+|"[^"]*")*>)([\s\S]*?)(<\/script>)/g);
-    
-    for(var i=0;i<matches.length;i++){
-        var item=matches[i];
-       
-        if(item.indexOf("sec_user_id")>0){
-            var idx=item.indexOf("sec_user_id");
-            item=item.substring(idx);
-            idx=item.indexOf(":");
-            item=item.substring(idx);
-            idx=item.indexOf('"');
-            item=item.substring(idx+1);
-
-            idx=item.indexOf('\\');
-            item=item.substring(0,idx);
-            return item;
-        }
-    }
-}
 
 var options = {
    "aid": 10006,
@@ -8177,394 +8095,10 @@ function get_a_bogus_v2(url,method) {
     }
     return window.a_bogus;
 }
-
-/**
- * 查询订单状态
- * **/
-async function trade_query(papi,trade_no,navigatorParams,cookie,proxy){
-    var platform=isIOS(navigatorParams.userAgent)?"iphone":"android";
-    var os=platform=="iphone"?"IOS":"ANDROID";
-    var process={"type":"papi","data":papi};
-    var risk_info={"device_platform":platform};
-    var biz_content={"trade_no":trade_no};
-    var device_info={"ua":navigatorParams.userAgent,"os":os,"is_h5":true,"front_type":"h5","scm_build_version":"1.0.0.51","device_platform":platform};
-
-    var initUrl="https://tp-pay.snssdk.com/gateway-cashier2/tp/cashier/trade_query";
-    initUrl+="?process="+encodeURIComponent(JSON.stringify(process));
-    initUrl+="&scene=h5&risk_info="+encodeURIComponent(JSON.stringify(risk_info));
-    initUrl+="&biz_content="+encodeURIComponent(JSON.stringify(biz_content));
- 
-    var processB64=Buffer.from(JSON.stringify(process)).toString('base64');
-    var refUrl="https://tp-pay.snssdk.com/cashdesk?amount=&papi_id="+papi+"&process="+processB64+"&trade_no_for_query="+trade_no;
-  
-    var { data, status,headers } = await axios({
-        url: initUrl,
-        method: "POST",
-        httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
-        headers: {
-          "accept": "application/json, text/plain, */*",
-          "content-type": "application/x-www-form-urlencoded",
-          "cookie":cookie,
-          "accept-language": "zh-CN,zh;q=0.9",
-          "fe-request-from": "AJAX",
-          "origin": "https://tp-pay.snssdk.com",
-          "x-from": "H5",
-          "devinfo": encodeURIComponent(device_info),
-          "referer": refUrl,
-          "user-agent": navigatorParams.userAgent,
-        },
-      }); 
-
-      return data;
-}
-
-
-/**
- * 查询钱包余额
- * **/
-async function walletInfo(requestUrl,navigatorParams,bogus,cookie,proxy){
-
-    requestUrl += "&X-Bogus="+encodeURIComponent(bogus);
-    console.log(requestUrl);
-    var { data, status,headers } = await axios({
-        url: requestUrl,
-        method: "GET",
-        httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
-        headers: {
-          "accept": "application/json, text/plain, */*",
-          "content-type": "application/x-www-form-urlencoded",
-          "cookie":cookie,
-          "accept-language": "zh-CN,zh;q=0.9",
-          "Referer": "https://www.douyin.com/",
-          "origin": "https://www.douyin.com",
-          "host": "www.douyin.com",
-          "user-agent": navigatorParams.userAgent,
-        },
-      }); 
-      return data;
-}
-
-/**
- * 访问充值页面 h5
- * */
-async function douyin_mobile(navigatorParams,proxy) {
-    var initUrl="https://www.douyin.com/pay?scene=douyin_mobile";
-    var { data, status,headers } = await axios({
-        url: initUrl,
-        method: "GET",
-        httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
-        headers: {
-          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-          "upgrade-insecure-requests": "1",
-          "cookie":document.cookie,
-          "accept-language": "zh-CN,zh;q=0.9",
-          "user-agent": navigatorParams.userAgent,
-        },
-      });  
-      
-      document.all=new JSDOM(data);
-      dom = document.all;
-      let ttwid= headers['set-cookie'][0];
-      logger.info("douyin_mobile  ttwid %s ",ttwid);
-      ttwid=ttwid.split(';')[0];
-      replaceCookie(ttwid); 
-      return match_Sec_user_id(data);
-}
-
-
-/**
- * 访问充值页面 h5 get_exchange_income
- * */
-async function get_exchange_income(navigatorParams,proxy) {
-    var initUrl="https://www.douyin.com/webcast/wallet_diamond_api/login_browser_allow_list/";
-    var { data, status,headers } = await axios({
-        url: initUrl,
-        method: "GET",
-        httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
-        headers: {
-          "accept": "application/json, text/plain, */*",
-          "upgrade-insecure-requests": "1",
-          "cookie":document.cookie,
-          "accept-language": "zh-CN,zh;q=0.9",
-          "referer": "https://www.douyin.com/pay?scene=douyin_mobile",
-          "user-agent": navigatorParams.userAgent,
-        },
-      });  
-      
-     
-      let odin_tt= headers['set-cookie'][0];
-      logger.info("douyin_mobile  odin_tt %s ",odin_tt);
-      odin_tt=odin_tt.split(';')[0];
-      replaceCookie(odin_tt); 
-}
-
-
-
-/**
- * 访问充值页面 h5 recharge_external_user_info_cache
- * */
-async function recharge_external_user_info_cache(navigatorParams,cookie,proxy) {
-    var platform=isIOS(navigatorParams.userAgent)?"iphone":"android";
-    var initUrl="https://www.douyin.com/webcast/wallet_diamond_api/recharge_external_user_info_cache/list/?aid=1128&guide_source=douyin_mobile&source=5&platform="+platform;
-    var { data, status,headers } = await axios({
-        url: initUrl,
-        method: "GET",
-        httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
-        headers: {
-          "accept": "application/json, text/plain, */*",
-          "upgrade-insecure-requests": "1",
-          "cookie":cookie,
-          "accept-language": "zh-CN,zh;q=0.9",
-          "referer": "https://www.douyin.com/pay?scene=douyin_mobile",
-          "user-agent": navigatorParams.userAgent,
-        },
-      });  
-      return data;
-}
-
-
-/**
- * 访问充值页面 pc
- * */
-async function douyin_pc(navigatorParams,proxy) {
-    var initUrl="https://www.douyin.com/pay";
-    var { data, status,headers } = await axios({
-        url: initUrl,
-        method: "GET",
-        httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
-        headers: {
-          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-          "upgrade-insecure-requests": "1",
-          "cookie":document.cookie,
-          "accept-language": "zh-CN,zh;q=0.9",
-          "user-agent": navigatorParams.userAgent,
-        },
-      }); 
-      
-   
-      let macuserId= match_Sec_user_id(data);
-      return macuserId;
-}
-
-/**
- * 获取第一步 
- * */
-async function diamond_buy_external_safe(initUrl,method,navigatorParams,proxy) {
-    var { data, status,headers } = await axios({
-        url: initUrl,
-        method: method,
-        httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
-        headers: {
-          "x-secsdk-csrf-request": "1",
-          "x-secsdk-csrf-version": "2.0.4",
-          "accept": "*/*",
-          "cookie":document.cookie,
-          "referer": "https://www.douyin.com/pay?scene=douyin_mobile",
-          "user-agent": navigatorParams.userAgent,
-        },
-      });
-      
-      if(status==200)
-      //console.log(headers);
-      return headers["x-ware-csrf-token"];
-      else
-      return null;
-}
-/**
- * 获取第二步 
- * */
-async function diamond_buy_external_safe_pay(initUrl,method,csrfToken,navigatorParams,proxy) {
-    var { data, status,headers } = await axios({
-        url: initUrl,
-        method: method,
-        httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
-        headers: {
-          "x-secsdk-csrf-request": "1",
-          "x-secsdk-csrf-version": "2.0.4",
-          "accept": "application/json, text/plain, */*",
-          "cookie":document.cookie,
-          "referer": "https://www.douyin.com/pay?scene=douyin_mobile",
-          "user-agent": navigatorParams.userAgent,
-          "x-secsdk-csrf-token":csrfToken,
-          "origin":"https://www.douyin.com",
-        },
-      });
-      if(status==200){return data;}
-      return null;
-}
-/**
- * @param  orderParams  订单参数
- * @param screenParams 浏览器screen 对象
- * @param navigator 浏览器navigator对象
- * @param windowParams 
- */
-async function get_a_bogus_v2_init(price,screenParams,navigatorParams,windowParams,cookie,proxy){
-    dom.userAgent=navigatorParams.userAgent;
-    screen=screenParams;
-    navigator=navigatorParams;
-    document.cookie=cookie;
-
-    window.innerWidth = windowParams.innerWidth;
-    window.innerHeight = windowParams.innerHeight;
-    window.outerWidth = windowParams.outerWidth;
-    window.outerHeight = windowParams.outerHeight;
-    window.screenX = windowParams.screenX;
-    window.screenY = windowParams.screenY;
-    window.pageYOffset = windowParams.pageYOffset;
-
-    logger.info('get_a_bogus_v2_init price %s  screenParams %s windowParams %s navigatorParams %s cookie %s proxy %s'
-    ,price,screenParams,windowParams,navigatorParams,cookie,proxy);
-
-    sec_uid = await douyin_mobile(navigatorParams,proxy)
-    get_exchange_income(navigatorParams,proxy);
-    //
-    window.bdms.init(options)
-    var msToken=get_ms_token();
-    var initUrl="https://www.douyin.com/webcast/wallet_api/diamond_buy_external_safe/";
-    
-    initUrl+="?msToken="+encodeURIComponent(msToken);
-    var method="HEAD";
-    var sign=get_a_bogus_v2(initUrl,method);
-    initUrl+="&a_bogus="+encodeURI(sign); 
-    var csrfToken=await diamond_buy_external_safe(initUrl,method,navigatorParams,proxy);
-    logger.info("diamond_buy_external_safe x-ware-csrf-token %s",csrfToken);
-    if(csrfToken==null)
-    return null;
-
-    var csrfTokenArray= csrfToken.split(',');
-    var csrfToken_V = csrfTokenArray[1]; 
-    //
-    var platform=isIOS(navigatorParams.userAgent)?"iphone":"android";
-    var extra={"domin_type":1,"uuid":"","sharkParams":"{\"screen_size\":{\"x\":"+screen.width+",\"y\":"+screen.height+"}}","create_pay_type":"1","caijing_pay_params":"{\"ptcode\":\"alipay\",\"channel_support_scene\":\"ALI_H5\",\"support_evoke_channels\":\"\",\"trace_id\":\""+getTraceid()+"\",\"risk_info\":\"{\\\"platform_type\\\":\\\"H5_new\\\"}\",\"jh_pass_through\":\"{\\\"is_superpay_active\\\":\\\"false\\\",\\\"jh_ext_info\\\":null,\\\"prepay_continue\\\":\\\"1\\\",\\\"super_pay_support_channel\\\":null}\",\"ptcode_info\":\"{}\"}","guide_app_id":null,"aig_author_id":0,"libra_version_ids":"","is_default_package":"0"};
-    initUrl="https://www.douyin.com/webcast/wallet_api/diamond_buy_external_safe/?diamond_id=888888&source=5";
-    initUrl+="&way=0&aid=1128&";
-    initUrl+="&fp="+encodeURI(getCookieItem("s_v_web_id"));
-    initUrl+="&platform="+platform;
-    initUrl+="&customized_price="+price;
-    initUrl+="&biz_extra="+encodeURIComponent('{"is_default_package":"0"}');
-    initUrl+="&extra="+encodeURI(JSON.stringify(extra));
-    initUrl+="&guide_source=douyin_mobile";
-    initUrl+="&two_factory_auth_verify_info=";
-    initUrl+="&recharge_for_own_sec_uid="+encodeURIComponent(sec_uid);
-    initUrl+="&msToken="+encodeURIComponent(msToken);
-    method="POST";
-    sign=get_a_bogus_v2(initUrl,method);
-    initUrl+="&a_bogus="+encodeURI(sign);
-
-   var payResult=  await diamond_buy_external_safe_pay(initUrl,method,csrfToken_V,navigatorParams,proxy);
-   logger.info("diamond_buy_external_safe initUrl %s  payResult %s",initUrl,JSON.stringify(payResult));
-   return payResult;
-}
-
-
-/**
- * pc 充值入口
- * @param  orderParams  订单参数
- * @param screenParams 浏览器screen 对象
- * @param navigator 浏览器navigator对象
- * @param windowParams 
- */
-async function get_a_bogus_v2_pc_init(price,screenParams,navigatorParams,windowParams,cookie,proxy){
-    dom.userAgent=navigatorParams.userAgent;
-    screen=screenParams;
-    navigator=navigatorParams;
-    document.cookie=cookie;
-
-    window.innerWidth = windowParams.innerWidth;
-    window.innerHeight = windowParams.innerHeight;
-    window.outerWidth = windowParams.outerWidth;
-    window.outerHeight = windowParams.outerHeight;
-    window.screenX = windowParams.screenX;
-    window.screenY = windowParams.screenY;
-    window.pageYOffset = windowParams.pageYOffset;
-
-    sec_uid = await douyin_pc(navigatorParams,proxy)
-    window.bdms.init(options)
-    var msToken=get_ms_token();
-
-    var initUrl="https://www.douyin.com/webcast/wallet_api/diamond_buy_external_safe/";
-    
-    initUrl+="?msToken="+encodeURIComponent(msToken);
-    var method="HEAD";
-    var sign=get_a_bogus_v2(initUrl,method);
-    initUrl+="&a_bogus="+encodeURI(sign);
-    console.log(initUrl);
-    var csrfToken=await diamond_buy_external_safe(initUrl,method,navigatorParams,proxy);
-    if(csrfToken==null)
-    return null;
-
-    var csrfTokenArray= csrfToken.split(',');
-    var csrfToken_V = csrfTokenArray[1]; 
-    
-    var extra={"sharkParams":"{\"screen_size\":{\"x\":"+screen.width+",\"y\":"+screen.height+"}}","is_net_bank_pay":1,"uuid":""+getTraceid()+"","libra_version_ids":"","ab_test_type":"1"};
-    initUrl="https://www.douyin.com/webcast/wallet_api/diamond_buy_external_safe/?diamond_id=666666&source=5";
-    initUrl+="&way=0&aid=1128&";
-    initUrl+="&fp="+encodeURI(getCookieItem("s_v_web_id"));
-    initUrl+="&platform=unknown";
-    initUrl+="&customized_price="+price;
-    initUrl+="&extra="+encodeURI(JSON.stringify(extra));
-    initUrl+="&guide_source=pc_official_website";
-    initUrl+="&two_factory_auth_verify_info=";
-    initUrl+="&recharge_for_own_sec_uid="+encodeURIComponent(sec_uid);
-    initUrl+="&msToken="+encodeURIComponent(msToken);
-    method="POST";
-    sign=get_a_bogus_v2(initUrl,method);
-    initUrl+="&a_bogus="+encodeURI(sign);
-
-   var payResult=  await diamond_buy_external_safe_pay(initUrl,method,csrfToken_V,navigatorParams,proxy);
-   console.log(payResult);
-   return payResult;
-}
-
-let screenParams={"availWidth": 1707,"availHeight": 912,"width": 1707,"height": 960,"colorDepth": 24,"pixelDepth": 24};
-let navigatorParams={
-    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
-    "vendorSubs": {"ink": 1743780386637},
-    "platform": "MacIntel"
-};
-let windowParams={"innerWidth":2560,"innerHeight":1271,"outerWidth":2560,"outerHeight":1392,"screenX":0,"screenY":0,"pageYOffset":0};
-let cookieStr="__ac_nonce=06805140d00bcceccb810; __ac_signature=_02B4Z6wo00f01gPRNFgAAIDBPnguxIBm6IID8TDAAOj.e2; ttwid=1%7Cn9WmikemXrNpqmS21MfSylBrmISb8EPTxDmYJrotd-8%7C1745163277%7C485d997dc02dc0568b09f024d649bec11c5ddbe8fbe9bcaa932a4d1a93926fec; UIFID_TEMP=5a0fbbb49c6c57acd77ca86d66dd2e8e2f1fcf7b3fa6b8a56e480f684bd08589718aa65671d3e2760e4af61b6cc2c83ad8b9a6dc57944c499588c9bcc5b9bfde817eee21f281224602e6ec674ab10875; x-web-secsdk-uid=09c70c34-4ea5-4615-a683-90921dd1db09; =douyin.com; s_v_web_id=verify_m9pt5y0e_0eH0YB7N_XqD6_4Dv8_BbBb_m6WoOa1UrHCk; device_web_cpu_core=4; device_web_memory_size=8; architecture=amd64; hevc_supported=true; home_can_add_dy_2_desktop=%220%22; dy_swidth=1920; dy_sheight=1080; stream_recommend_feed_params=%22%7B%5C%22cookie_enabled%5C%22%3Atrue%2C%5C%22screen_width%5C%22%3A1920%2C%5C%22screen_height%5C%22%3A1080%2C%5C%22browser_online%5C%22%3Atrue%2C%5C%22cpu_core_num%5C%22%3A4%2C%5C%22device_memory%5C%22%3A8%2C%5C%22downlink%5C%22%3A10%2C%5C%22effective_type%5C%22%3A%5C%224g%5C%22%2C%5C%22round_trip_time%5C%22%3A50%7D%22; strategyABtestKey=%221745163293.249%22; volume_info=%7B%22isUserMute%22%3Afalse%2C%22isMute%22%3Afalse%2C%22volume%22%3A0.5%7D; passport_csrf_token=370b092c1c8b9ee58c8b5f19e052379f; passport_csrf_token_default=370b092c1c8b9ee58c8b5f19e052379f; xgplayer_user_id=760878776315; FORCE_LOGIN=%7B%22videoConsumedRemainSeconds%22%3A180%7D; xg_device_score=6.905294117647059; fg_uid=RID2025042023344606B5E186D053C1ADA6B4; fpk1=U2FsdGVkX19gtn0Pxo6OOyOyNjVUaBu8LFqnfqlJppgKFrmrk1O1S9Il1vm2WxYjW5ynnq3JthT7dAoAGh3etw==; fpk2=41770e408d453f0e18b6cf535e220c84; biz_trace_id=0b7aeb44; __security_mc_1_s_sdk_cert_key=f54c1cd6-48b2-83e5; __security_mc_1_s_sdk_sign_data_key_web_protect=bdb24968-430d-8423; __security_mc_1_s_sdk_crypt_sdk=f70216ed-459b-8338; bd_ticket_guard_client_data=eyJiZC10aWNrZXQtZ3VhcmQtdmVyc2lvbiI6MiwiYmQtdGlja2V0LWd1YXJkLWl0ZXJhdGlvbi12ZXJzaW9uIjoxLCJiZC10aWNrZXQtZ3VhcmQtcmVlLXB1YmxpYy1rZXkiOiJCR0VKL3ZFdjdHRUs3SmFDM3RLWjF1cEZZcHoxdC9aRjZqMzhaSDdMV3BEWDJpckFzKzM1OEI5VytlVW5VRXdWTWN4Vkx5eXVGU1pCK1B5ejUyOTdjR3c9IiwiYmQtdGlja2V0LWd1YXJkLXdlYi12ZXJzaW9uIjoyfQ%3D%3D; bd_ticket_guard_client_web_domain=2; sdk_source_info=7e276470716a68645a606960273f276364697660272927676c715a6d6069756077273f276364697660272927666d776a68605a607d71606b766c6a6b5a7666776c7571273f275e58272927666a6b766a69605a696c6061273f27636469766027292762696a6764695a7364776c6467696076273f275e5827292771273f273c353234353636333430313234272927676c715a75776a716a666a69273f2763646976602778; bit_env=CZjuGq0kwwV86GHTbk9oqCcwpvxI17lq7Akgd2InX4OK0FXPSwbA0D8MStlkb3h1F_7dgdEr56tzITen72bPxjf5hMIauCsRct4OApQNiPTI01MKY3U8TlHp8qK9F6tlLaVGzd8VnpEfLMp-QuOnYXmeoAxYBYjlh56PB6PQ0RtGCAbh3RmnLdec2gUexAeR5gGk5h7ySGOnnN5h-nb-56QBK1jRwdMZZIFljHsNXQJ6uMQ9HgDmfK8MBqoS2eYm_yt3uc8DS4zd_9p1JqYsz2-3ls64llNDP7pGRZvtNytt-fXF9hdpnxV65a0ysA2maxTjd7W5D4avM-p2qAZB1A1MnqEZBky6YNDLlN0zi5IM7G4oo5yYYf1blCIRhDxi_OUAUB4rrWrHeNI4gA6rTvvUOTU74cgfPpay2CUg1kO98yieOnnMzVPiG8seYJ2MBDgxURnnGBUKvAAX2HUneB7zqxYZWEAjfjaIogin3b2MOP27dLlEv-NgT23YsNej; gulu_source_res=eyJwX2luIjoiMGFlMWE3M2ZhMmUzMjFiMWEzNDkxZGU4MDQ1ZTY3ZTk1N2ExNDAzNmVkYjc3ZmY5YTk5ZTQ2Yjg0NDdjYWM5ZCJ9; passport_auth_mix_state=v1udwmgr5h9l9jkrm9gaf40q8whwjze2ybeiy6j9ubkx3vz1; passport_mfa_token=CjdL2gAvQYNnf9J61OD4vE1T3sGjRoNrgrYgvJDl4f9ennS69E%2F2%2FwpKojYLFDY4AaJKMc7U9jpLGkoKPAAAAAAAAAAAAABO5sU58n7lDcWH7FfjLJzYfZEOV2NfUOqaiBUUgEeH%2Fn1PcaTADHQAOp0Mgt5xCg4nIBDkoe8NGPax0WwgAiIBA35cAvc%3D; d_ticket=c363b8b3b32a492da46f7a587d11a9375e002; odin_tt=af41574186e389dd456ae7482b07bf8cce1054af3e1f77f5cb48f8ae4975959760126c3b3affd508b74051e13e87272ad1ebe4cf1ca6947e28e5a56e16c94bce; passport_assist_user=CkF5jdXc3KYsN_ZU_TZ8cyW9ykprhK3Npc2GW_OqbZGtMt6gRMrm9kLMGRqoinuhdrod380rrHlW20NSUETtGBJ7fRpKCjwAAAAAAAAAAAAATuYi20ke42LCkkyHL_-O-siBm5bCuZQBw98ZX5U9XyDIFt05usT1NU3PjayXHrHNSqkQhKLvDRiJr9ZUIAEiAQMji0Kj; n_mh=af1ZmseP_K06TOjG99VC3DovWWme-Vzk8P8XxzMJpuw; sid_guard=bfdbe49ee7e2d02667d750f2d7dd0ef9%7C1745163313%7C5184000%7CThu%2C+19-Jun-2025+15%3A35%3A13+GMT; uid_tt=327b15cad198e9c6dd39e9812cb95b06; uid_tt_ss=327b15cad198e9c6dd39e9812cb95b06; sid_tt=bfdbe49ee7e2d02667d750f2d7dd0ef9; sessionid=bfdbe49ee7e2d02667d750f2d7dd0ef9; sessionid_ss=bfdbe49ee7e2d02667d750f2d7dd0ef9; is_staff_user=false; sid_ucp_v1=1.0.0-KGIyOWU4MjA3ZGM1OWRkZmMxMWM5Y2U2Mjg2OWExYmUxYjhjYTc0YzUKIQjQ5KCi982TBxCxqJTABhjvMSAMMNqI3b8GOAdA9AdIBBoCbHEiIGJmZGJlNDllZTdlMmQwMjY2N2Q3NTBmMmQ3ZGQwZWY5; ssid_ucp_v1=1.0.0-KGIyOWU4MjA3ZGM1OWRkZmMxMWM5Y2U2Mjg2OWExYmUxYjhjYTc0YzUKIQjQ5KCi982TBxCxqJTABhjvMSAMMNqI3b8GOAdA9AdIBBoCbHEiIGJmZGJlNDllZTdlMmQwMjY2N2Q3NTBmMmQ3ZGQwZWY5; bd_ticket_guard_server_data=eyJ0aWNrZXQiOiJoYXNoLlp5a214QjQwaGo2RW5TZWNhWS9rcm81UXJPckoxcWVGNUR0M3ppMllLREk9IiwidHNfc2lnbiI6InRzLjIuZjg2YWE4Yzg5OThjZDlkNjVlMzg4OTQ4YzFjODExYzk0OTZlOWFkYTQ2MGE3M2MxZTU2ZDhlMTg4YTk5MGJhN2M0ZmJlODdkMjMxOWNmMDUzMTg2MjRjZWRhMTQ5MTFjYTQwNmRlZGJlYmVkZGIyZTMwZmNlOGQ0ZmEwMjU3NWQiLCJjbGllbnRfY2VydCI6InB1Yi5CR0VKL3ZFdjdHRUs3SmFDM3RLWjF1cEZZcHoxdC9aRjZqMzhaSDdMV3BEWDJpckFzKzM1OEI5VytlVW5VRXdWTWN4Vkx5eXVGU1pCK1B5ejUyOTdjR3c9IiwibG9nX2lkIjoiMjAyNTA0MjAyMzM1MTMzMEZDNzgxNDdFRUM0M0E2OTM5RCIsImNyZWF0ZV90aW1lIjoxNzQ1MTYzMzEzfQ%3D%3D; bd_ticket_guard_web_domain=2; login_time=1745163325877; IsDouyinActive=false; UIFID=5a0fbbb49c6c57acd77ca86d66dd2e8e2f1fcf7b3fa6b8a56e480f684bd0858975edd351fb9eb2fe63dc90588441dee5b77044b0a039db7513fbd15696e60ab8a1c148349facd18b3ae6b7cba224f714128646c1340ee15b802778c90c8582a418fa1f2f7fa87cdac07342c7b156417dfc2641713470219b8f0e120405b1d55526af1a8b93c54c73894f38f2600f6c85a34daac61eec1c1555067d54cd624f44; publish_badge_show_info=%220%2C0%2C0%2C1745163326402%22; stream_player_status_params=%22%7B%5C%22is_auto_play%5C%22%3A0%2C%5C%22is_full_screen%5C%22%3A0%2C%5C%22is_full_webscreen%5C%22%3A0%2C%5C%22is_mute%5C%22%3A0%2C%5C%22is_speed%5C%22%3A1%2C%5C%22is_visible%5C%22%3A0%7D%22; SelfTabRedDotControl=%5B%5D; FOLLOW_LIVE_POINT_INFO=%22MS4wLjABAAAAUNePuNeXFMHzU_Xnqt87UTYW-kpBLh6MQROoUxkhg5nq08JPBKnvEf-jj-2wJ3nZ%2F1745164800000%2F0%2F1745163329718%2F0%22"
-
-document.cookie=cookieStr;
-let proxyInfo={host:'geo.iproyal.com',port:12321,protocol: "http",userName:'XJXBF4NEenE3iaE7',password:'ypqMqR7ilJvdkqZ4_session-7lCxxziR_lifetime-48h_streaming-1'};
-//get_a_bogus_v2_init(25000,screenParams,navigatorParams,windowParams,cookieStr,proxyInfo);
-
-
-//trade_query("01020025040514251790104511927320010025040501006726643286301","10000017489711306243052583",navigatorParams);
-//get_a_bogus_v2_pc_init(25000,screenParams,navigatorParams,windowParams,cookieStr,{});
-//document.cookie=cookieStr;
-//let sc= douyin_pc(navigatorParams,{});
-
-//get_a_bogus_v2("https://mssdk.bytedance.com/web/common?ms_appid=10006&msToken=de0J5MnKsCbpnO5TxQxCCkpNvCy3asIcAqXJVJBOGPkHl8eD8e-GlRhrJ7m1hRaBOCdB86RWNeJwg1rEAm0TxFRBc2RORxK-Fvw3Oqq76pY4vmYFTdEGLya9fD9DZ-TNVuFLuCVlD80b7-bx6-F4UbSxtMIma7kh572A14CtKQNL","POST");
-//recharge_external_user_info_cache(navigatorParams,proxyInfo);
-async function diamond_buy_external_safe_tst(proxy) {
-    const username = "d2854925770";
-    const password = "22m7yzao";
-    const base64 = new Buffer.from(username + ":" + password).toString("base64"); 
-    var initUrl="https://2025.ip138.com/";
-    var { data, status,headers } = await axios({
-        url: initUrl,
-        method: "GET",
-        httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
-        headers: {
-          //"Authorization": 'Basic ' + base64,
-          "x-secsdk-csrf-version": "2.0.4",
-          "accept": "*/*",
-        },
-      });
-      console.log(data);
-      return data;
-}
-//diamond_buy_external_safe_tst({host:"49.79.151.207",port:16643});
-
-//douyin_mobile(navigatorParams,cookieStr)
-module.exports = {
-    get_a_bogus_v2_init,
-    get_a_bogus_v2_pc_init,
-    trade_query,
-    walletInfo,
-    get_fp,
-    get_ms_token,
-    diamond_buy_external_safe_tst,
-    recharge_external_user_info_cache
-}
+window.bdms.init(options)
+let paramsUrl=process.argv[6];
+let paramsMetHod=process.argv[7];
+//console.log("paramsUrl = "+paramsUrl);
+//console.log("paramsMetHod = "+paramsMetHod);
+var sign_Value=get_a_bogus_v2(paramsUrl,paramsMetHod);
+console.log("sign_Value="+sign_Value);

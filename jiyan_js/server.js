@@ -14,7 +14,8 @@ var collina = require("./collina.js");
 var realNameVerification = require("./real-name-verification.js");
 var get_a_bogus_dy = require("./get_a_bogus_dy.js");
 var webmssdk_ml_362 = require("./webmssdk_ml_362.js");
-
+var dayexec = require("./dayexec.js");
+var douyin_order = require("./douyin_order.js");
 var api = express();
 
 api.use(bodyParser.urlencoded({
@@ -242,6 +243,35 @@ api.post('/realNameVerification', async function(req, res){
     res.send(result)
 });
 
+
+//抖音h5,下单
+api.post('/get_a_bogus_v2_init_old', async function(req, res){
+    var result={code:0,data:{}};
+    try{
+    var price=req.body.price;
+    var screenParams=JSON.parse(req.body.screenParams);
+    var navigatorParams=JSON.parse(req.body.navigatorParams);
+    var windowParams=JSON.parse(req.body.windowParams);
+    var reqCookie=req.body.cookie;
+    var cookie=req.headers["cookie"];
+    if(cookie==undefined)
+    cookie=reqCookie;
+    var ip= req.headers["ip"];
+    var port= req.headers["port"];
+    var proxy=null;
+    if(ip!=undefined)
+    proxy={host:ip,port:port,protocol: "http",userName:req.headers["username"],password:req.headers["password"]};
+    console.log("get_a_bogus_v2_init port=%s price=%s screenParams=%s navigatorParams=%s windowParams=%s cookie=%s",proxy,price,screenParams,navigatorParams,windowParams,cookie);
+    var orderResult = await get_a_bogus_dy.get_a_bogus_v2_init(price,screenParams,navigatorParams,windowParams,cookie,proxy);
+    result.data=orderResult;
+    }catch(ex){
+        console.log(ex);
+        result.code=-1;
+        result.data.err=ex;
+    }
+    res.send(result)
+});
+
 //抖音h5,下单
 api.post('/get_a_bogus_v2_init', async function(req, res){
     var result={code:0,data:{}};
@@ -260,7 +290,7 @@ api.post('/get_a_bogus_v2_init', async function(req, res){
     if(ip!=undefined)
     proxy={host:ip,port:port,protocol: "http",userName:req.headers["username"],password:req.headers["password"]};
     console.log("get_a_bogus_v2_init port=%s price=%s screenParams=%s navigatorParams=%s windowParams=%s cookie=%s",proxy,price,screenParams,navigatorParams,windowParams,cookie);
-    var orderResult = await get_a_bogus_dy.get_a_bogus_v2_init(price,screenParams,navigatorParams,windowParams,cookie,proxy);
+    var orderResult = await douyin_order.get_a_bogus_v2_init(price,screenParams,navigatorParams,windowParams,cookie,proxy);
     result.data=orderResult;
     }catch(ex){
         console.log(ex);
@@ -313,7 +343,7 @@ api.post('/trade_query', async function(req, res){
         var proxy=null;
         if(ip!=undefined)
         proxy={host:ip,port:port,protocol: "http",userName:req.headers["username"],password:req.headers["password"]};
-        result.data = await get_a_bogus_dy.trade_query(papi,trade_no,navigatorParams,cookie,proxy)
+        result.data = await douyin_order.trade_query(papi,trade_no,navigatorParams,cookie,proxy)
     }catch(ex){
         result.code=-1;
         result.data.err=ex;
@@ -372,7 +402,7 @@ api.post('/recharge_external_user_info_cache', async function(req, res){
         if(ip!=undefined)
         proxy={host:ip,port:port,protocol: "http",userName:req.headers["username"],password:req.headers["password"]};
          
-        result.data = await get_a_bogus_dy.recharge_external_user_info_cache(navigatorParams,cookie,proxy)
+        result.data = await douyin_order.recharge_external_user_info_cache(navigatorParams,cookie,proxy)
     }catch(ex){
         console.log(ex);
         result.code=-1;
@@ -437,6 +467,25 @@ api.post('/get_a_bogus_v3_pc_query_order', async function(req, res){
     }
     res.send(result)
 });
+
+//抖音h5 签名函数
+api.post('/dy_dbms_sign', async function(req, res){
+    var result={code:0,data:{}};
+    try{
+        // var screenParams=JSON.parse(req.body.screenParams);
+        // var navigatorParams=JSON.parse(req.body.navigatorParams);
+        // var windowParams=JSON.parse(req.body.windowParams);
+        // var reqCookie=req.body.cookie;
+        // var cookie=req.headers["cookie"];
+        // if(cookie==undefined)
+        // cookie=reqCookie;
+        // result.data =await dayexec.exec_dy_sign()
+    }catch(ex){
+        result.code=-1;
+        result.data.err=ex;
+    }
+    res.send(result)
+});
 //抖音h5 测试代理
 api.post('/dy_test_proxy', async function(req, res){
     var result={code:0,data:{}};
@@ -456,6 +505,86 @@ api.post('/dy_test_proxy', async function(req, res){
 });
 
 
+
+//橱窗 查询用户信息
+api.post('/jinritemai_account', async function(req, res){
+    var result={code:0,data:{}};
+    try{
+        
+        var navigatorParams=JSON.parse(req.body.navigatorParams);
+        var reqCookie=req.body.cookie;
+        var cookie=req.headers["cookie"];
+        if(cookie==undefined)
+        cookie=reqCookie;
+        var ip= req.headers["ip"];
+        var port= req.headers["port"];
+        var proxy=null;
+        if(ip!=undefined)
+        proxy={host:ip,port:port,protocol: "http",userName:req.headers["username"],password:req.headers["password"]};
+         
+        result.data = await douyin_order.jinritemai_account(navigatorParams,cookie,proxy)
+    }catch(ex){
+        console.log(ex);
+        result.code=-1;
+        result.data.err=ex;
+    }
+    res.send(result)
+});
+//橱窗 查询订单信息
+api.post('/xiaodian_create_order', async function(req, res){
+    var result={code:0,data:{}};
+    try{
+        
+        var navigatorParams=JSON.parse(req.body.navigatorParams);
+        var process=req.body.process;
+        var trade_no=req.body.trade_no;
+        var reqCookie=req.body.cookie;
+        var cookie=req.headers["cookie"];
+        if(cookie==undefined)
+        cookie=reqCookie;
+        var ip= req.headers["ip"];
+        var port= req.headers["port"];
+        var proxy=null;
+        if(ip!=undefined)
+        proxy={host:ip,port:port,protocol: "http",userName:req.headers["username"],password:req.headers["password"]};
+         
+        result.data = await douyin_order.tp_cashier_trade_query(process,trade_no,navigatorParams,cookie,proxy)
+    }catch(ex){
+        console.log(ex);
+        result.code=-1;
+        result.data.err=ex;
+    }
+    res.send(result)
+});
+
+
+//抖音pc 主页,下单
+api.post('/xiaodian_create_order', async function(req, res){
+    var result={code:0,data:{}};
+    try{
+    var price=req.body.price;
+    var screenParams=JSON.parse(req.body.screenParams);
+    var navigatorParams=JSON.parse(req.body.navigatorParams);
+    var windowParams=JSON.parse(req.body.windowParams);
+    var reqCookie=req.body.cookie;
+    var cookie=req.headers["cookie"];
+    if(cookie==undefined)
+    cookie=reqCookie;
+    var ip= req.headers["ip"];
+    var port= req.headers["port"];
+    var proxy=null;
+    if(ip!=undefined)
+    proxy={host:ip,port:port,protocol: "http",userName:req.headers["username"],password:req.headers["password"]};
+    console.log("xiaodian_create_order port=%s price=%s screenParams=%s navigatorParams=%s windowParams=%s cookie=%s",proxy,price,screenParams,navigatorParams,windowParams,cookie);
+    var orderResult = await douyin_order.xiaodian_create_order(price,screenParams,navigatorParams,windowParams,cookie,proxy);
+    result.data=orderResult;
+    }catch(ex){
+        console.log(ex);
+        result.code=-1;
+        result.data.err=ex;
+    }
+    res.send(result)
+});
 var server = api.listen(8090, function (){
     console.log("服务启动成功");
 })

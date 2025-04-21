@@ -3111,7 +3111,7 @@ function getCookieItem(key){
 /**
  * 访问充值页面 pc
  * */
-async function douyin_pc(navigatorParams,proxy) {
+async function douyin_pc(navigatorParams,cookie,proxy) {
     var initUrl="https://www.douyin.com/pay";
     var { data, status,headers } = await axios({
         url: initUrl,
@@ -3120,7 +3120,7 @@ async function douyin_pc(navigatorParams,proxy) {
         headers: {
           "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
           "upgrade-insecure-requests": "1",
-          "cookie":document.cookie,
+          "cookie":cookie,
           "accept-language": "zh-CN,zh;q=0.9",
           "user-agent": navigatorParams.userAgent,
         },
@@ -3157,7 +3157,7 @@ function match_Sec_user_id(htmlContent){
 /**
  * 获取第一步 
  * */
-async function diamond_buy_external_safe(initUrl,method,navigatorParams,proxy) {
+async function diamond_buy_external_safe(initUrl,method,navigatorParams,cookie,proxy) {
     var { data, status,headers } = await axios({
         url: initUrl,
         method: method,
@@ -3166,7 +3166,7 @@ async function diamond_buy_external_safe(initUrl,method,navigatorParams,proxy) {
           "x-secsdk-csrf-request": "1",
           "x-secsdk-csrf-version": "2.0.4",
           "accept": "*/*",
-          "cookie":document.cookie,
+          "cookie":cookie,
           "referer": "https://www.douyin.com/pay?scene=douyin_mobile",
           "user-agent": navigatorParams.userAgent,
         },
@@ -3182,7 +3182,7 @@ async function diamond_buy_external_safe(initUrl,method,navigatorParams,proxy) {
 /**
  * 获取第一步 
  * */
-async function diamond_buy_external_safe(initUrl,method,navigatorParams,proxy) {
+async function diamond_buy_external_safe(initUrl,method,navigatorParams,cookie,proxy) {
     var { data, status,headers } = await axios({
         url: initUrl,
         method: method,
@@ -3208,14 +3208,14 @@ async function diamond_buy_external_safe(initUrl,method,navigatorParams,proxy) {
 /**
  * 获取第二步 
  * */
-async function diamond_buy_external_safe_pay(initUrl,method,csrfToken,navigatorParams,proxy) {
+async function diamond_buy_external_safe_pay(initUrl,method,csrfToken,navigatorParams,cookie,proxy) {
     var { data, status,headers } = await axios({
         url: initUrl,
         method: method,
         httpsAgent: new httpsProxyAgent.HttpsProxyAgent(`http://${proxy.userName}:${proxy.password}@${proxy.host}:${proxy.port}`),
         headers: {
           "accept": "application/json, text/plain, */*",
-          "cookie":document.cookie,
+          "cookie":cookie,
           "referer": "https://www.douyin.com/falcon/webcast_douyin/page/live_recharge_v2/index.html?app_id=1128&type=recharge&balance=0&amount=0&isFullScreen=true&scene=pc_topbanner&additionalLogParams=%7B%22enter_from_merge%22%3A%22discover%22%2C%22show_reason%22%3A%22navigation_bar%22%2C%22live_window_type%22%3A%22no_live_window%22%2C%22if_live_play%22%3A0%7D&theme=dark",
           "user-agent": navigatorParams.userAgent,
           "x-secsdk-csrf-token":csrfToken,
@@ -3249,11 +3249,11 @@ async function get_a_bogus_v2_init(price,screenParams,navigatorParams,windowPara
 
     window.byted_acrawler&&window.byted_acrawler.init({aid:1128,isSDK:!1,boe:!1,enablePathList:["/webcast/wallet_api/diamond_buy_external_safe/","/webcast/wallet/info/","/webcast/diamond/","/webcast/wallet_api/query_order/"],region:"cn"})
 
-    sec_uid = await douyin_pc(navigatorParams,proxy)
+    sec_uid = await douyin_pc(navigatorParams,cookie,proxy)
     var msToken=get_ms_token();
     var initUrl="https://www.douyin.com/ttwid/check/";
     var method="HEAD";
-    var csrfToken=await diamond_buy_external_safe(initUrl,method,navigatorParams,proxy);
+    var csrfToken=await diamond_buy_external_safe(initUrl,method,navigatorParams,cookie,proxy);
     console.log(csrfToken);
     if(csrfToken==null)
     return null;
@@ -3303,11 +3303,11 @@ async function query_order(orderNo,screenParams,navigatorParams,windowParams,coo
 
     window.byted_acrawler&&window.byted_acrawler.init({aid:1128,isSDK:!1,boe:!1,enablePathList:["/webcast/wallet_api/diamond_buy_external_safe/","/webcast/wallet/info/","/webcast/diamond/","/webcast/wallet_api/query_order/"],region:"cn"})
 
-    sec_uid = await douyin_pc(navigatorParams,proxy)
+    sec_uid = await douyin_pc(navigatorParams,cookie,proxy)
     var msToken=get_ms_token();
     var initUrl="https://www.douyin.com/ttwid/check/";
     var method="HEAD";
-    var csrfToken=await diamond_buy_external_safe(initUrl,method,navigatorParams,proxy);
+    var csrfToken=await diamond_buy_external_safe(initUrl,method,navigatorParams,cookie,proxy);
     if(csrfToken==null)
     return null;
 
@@ -3324,7 +3324,7 @@ async function query_order(orderNo,screenParams,navigatorParams,windowParams,coo
     initUrl+="&X-Bogus="+encodeURI(sign.bogus);
     initUrl+="&_signature="+encodeURI(sign._signature);
 
-   var payResult=  await diamond_buy_external_safe_pay(initUrl,method,csrfToken_V,navigatorParams,proxy);
+   var payResult=  await diamond_buy_external_safe_pay(initUrl,method,csrfToken_V,navigatorParams,cookie,proxy);
    console.log(payResult);
    return payResult;
 }
