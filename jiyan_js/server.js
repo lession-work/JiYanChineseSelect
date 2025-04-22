@@ -531,7 +531,7 @@ api.post('/jinritemai_account', async function(req, res){
     res.send(result)
 });
 //橱窗 查询订单信息
-api.post('/xiaodian_create_order', async function(req, res){
+api.post('/tp_cashier_trade_query', async function(req, res){
     var result={code:0,data:{}};
     try{
         
